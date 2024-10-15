@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Embed Content</title>
+</head>
+<body>
+  <h1>Embed Content App</h1>
+  <input type="text" id="embed-url" placeholder="Enter URL to embed">
+  <button onclick="embedContent()">Embed</button>
+
+  <div id="embed-container" style="margin-top: 20px;"></div>
+
+  <script>
+    async function embedContent() {
+      const url = document.getElementById('embed-url').value;
+      const response = await fetch('/embed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url }),
+      });
+
+      const data = await response.json();
+      document.getElementById('embed-container').innerHTML = data.embedHTML;
+    }
+  </script>
+</body>
+</html>
