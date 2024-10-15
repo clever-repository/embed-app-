@@ -1,31 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Embed Content</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embed Content</title>
+    <style>
+        #message {
+            margin-top: 20px;
+            color: green;
+        }
+        #embed-container {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Embed Content App</h1>
-  <input type="text" id="embed-url" placeholder="Enter URL to embed">
-  <button onclick="embedContent()">Embed</button>
+    <h1>Embed Content from URL</h1>
+    <input type="text" id="embed-url" placeholder="Enter URL to embed">
+    <button onclick="embedContent()">Embed</button>
+    
+    <div id="message"></div>  <!-- Message area for user feedback -->
+    <div id="embed-container"></div> <!-- Container for the embedded content -->
+    
+    <script>
+        async function embedContent() {
+            const url = document.getElementById('embed-url').value;
+            const messageDiv = document.getElementById('message');
+            const embedContainer = document.getElementById('embed-container');
+            embedContainer.innerHTML = '';  // Clear previous content
+            messageDiv.textContent = '';     // Clear previous messages
 
-  <div id="embed-container" style="margin-top: 20px;"></div>
+            if (!url) {
+                messageDiv.textContent = "Please enter a URL to embed.";
+                messageDiv.style.color = "red"; // Show error message in red
+                return;
+            }
 
-  <script>
-    async function embedContent() {
-      const url = document.getElementById('embed-url').value;
-      const response = await fetch('/embed', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ url }),
-      });
+            try {
+                const response = await fetch('/embed', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url }),
+                });
 
-      const data = await response.json();
-      document.getElementById('embed-container').innerHTML = data.embedHTML;
-    }
-  </script>
+                const data = await response.json();
+
+                if (data.embedHTML) {
+                    embedContainer.innerHTML = data.embedHTML;
+                    messageDiv.textContent = "Content embedded successfully!";
+                    messageDiv.style.color = "green"; // Show success message in green
+                } else {
+                    messageDiv.textContent = data.message || "An error occurred while embedding.";
+                    messageDiv.style.color = "red"; // Show error message in red
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                messageDiv.textContent = "An error occurred. Please try again.";
+                messageDiv.style.color = "red"; // Show error message in red
+            }
+        }
+    </script>
 </body>
 </html>
+
